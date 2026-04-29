@@ -219,7 +219,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-start justify-center py-12 px-4">
-      <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-xl">
+      <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-5xl">
         <h1 className="text-2xl font-bold text-gray-800 mb-1">
           Media Diagnostic
         </h1>
@@ -424,7 +424,7 @@ function App() {
                     Checksums differ
                   </span>
                 </div>
-                <div className="rounded-xl border border-gray-200 overflow-hidden divide-y divide-gray-100 max-h-72 overflow-y-auto">
+                <div className="rounded-xl border border-gray-200 overflow-hidden divide-y divide-gray-100 max-h-[32rem] overflow-y-auto">
                   {allMatched.map((f) => (
                     <div key={f.filename} className="flex items-center gap-3 px-3 py-2">
                       {f.ok ? (
@@ -446,13 +446,11 @@ function App() {
             {/* Source only */}
             {sourceOnly.length > 0 && (
               <Section title={`Source only — not found in destination (${sourceOnly.length})`}>
-                <div className="rounded-xl border border-gray-200 overflow-hidden max-h-48 overflow-y-auto divide-y divide-gray-100">
+                <div className="rounded-xl border border-gray-200 overflow-hidden max-h-96 overflow-y-auto divide-y divide-gray-100">
                   {sourceOnly.map((f) => (
-                    <div key={f.name} className="flex items-baseline gap-2 px-3 py-1.5">
-                      <span className="text-sm font-mono text-gray-800">{f.name}</span>
-                      {f.rel_dir && (
-                        <span className="text-xs font-mono text-gray-400 truncate">{f.rel_dir}</span>
-                      )}
+                    <div key={f.name} className="grid grid-cols-2 gap-4 px-3 py-1.5">
+                      <span className="text-sm font-mono text-gray-800 break-all">{f.name}</span>
+                      <span className="text-sm font-mono text-gray-400 break-all">{f.rel_dir}</span>
                     </div>
                   ))}
                 </div>
@@ -462,13 +460,11 @@ function App() {
             {/* Dest only */}
             {destOnly.length > 0 && (
               <Section title={`Destination only — not found in source (${destOnly.length})`}>
-                <div className="rounded-xl border border-gray-200 overflow-hidden max-h-48 overflow-y-auto divide-y divide-gray-100">
+                <div className="rounded-xl border border-gray-200 overflow-hidden max-h-96 overflow-y-auto divide-y divide-gray-100">
                   {destOnly.map((f) => (
-                    <div key={f.name} className="flex items-baseline gap-2 px-3 py-1.5">
-                      <span className="text-sm font-mono text-gray-800">{f.name}</span>
-                      {f.rel_dir && (
-                        <span className="text-xs font-mono text-gray-400 truncate">{f.rel_dir}</span>
-                      )}
+                    <div key={f.name} className="grid grid-cols-2 gap-4 px-3 py-1.5">
+                      <span className="text-sm font-mono text-gray-800 break-all">{f.name}</span>
+                      <span className="text-sm font-mono text-gray-400 break-all">{f.rel_dir}</span>
                     </div>
                   ))}
                 </div>
