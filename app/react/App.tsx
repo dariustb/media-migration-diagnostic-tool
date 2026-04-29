@@ -201,9 +201,15 @@ function App() {
   const summary = isDone
     ? (job!.results.summary as Summary | undefined)
     : undefined;
+  const checksumOk = isDone
+    ? ((job!.results.checksum_ok as BadEntry[]) ?? [])
+    : [];
   const checksumBad = isDone
     ? ((job!.results.checksum_bad as BadEntry[]) ?? [])
     : [];
+  const allMatched = [...checksumOk.map((f) => ({ ...f, ok: true })), ...checksumBad.map((f) => ({ ...f, ok: false }))].sort((a, b) =>
+    a.filename.localeCompare(b.filename)
+  );
   const sourceOnly = isDone
     ? ((job!.results.source_only as string[]) ?? [])
     : [];
@@ -401,18 +407,36 @@ function App() {
               </p>
             )}
 
-            {/* Bad checksums */}
-            {checksumBad.length > 0 && (
-              <Section title={`Changed files (${checksumBad.length})`}>
-                <div className="rounded-xl border border-red-200 overflow-hidden divide-y divide-red-100">
-                  {checksumBad.map((f) => (
-                    <div key={f.filename} className="px-3 py-2 bg-red-50">
-                      <p className="text-sm font-medium text-red-700">
-                        {f.filename}
-                      </p>
-                      <p className="text-xs text-gray-500 font-mono truncate">
-                        {f.local_path}
-                      </p>
+            {/* Matched files */}
+            {allMatched.length > 0 && (
+              <Section title={`Matched files (${allMatched.length})`}>
+                <div className="flex gap-4 mb-2 text-xs text-gray-500">
+                  <span className="flex items-center gap-1">
+                    <svg className="w-3.5 h-3.5 text-green-500" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L8 12.586 4.707 9.293a1 1 0 00-1.414 1.414l4 4a1 1 0 001.414 0l8-8a1 1 0 000-1.414z" clipRule="evenodd" />
+                    </svg>
+                    Checksums match
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <svg className="w-3.5 h-3.5 text-yellow-500" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-3a1 1 0 00-1 1v.5a1 1 0 002 0V11a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    Checksums differ
+                  </span>
+                </div>
+                <div className="rounded-xl border border-gray-200 overflow-hidden divide-y divide-gray-100 max-h-72 overflow-y-auto">
+                  {allMatched.map((f) => (
+                    <div key={f.filename} className="flex items-center gap-3 px-3 py-2">
+                      {f.ok ? (
+                        <svg className="w-4 h-4 text-green-500 shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L8 12.586 4.707 9.293a1 1 0 00-1.414 1.414l4 4a1 1 0 001.414 0l8-8a1 1 0 000-1.414z" clipRule="evenodd" />
+                        </svg>
+                      ) : (
+                        <svg className="w-4 h-4 text-yellow-500 shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-3a1 1 0 00-1 1v.5a1 1 0 002 0V11a1 1 0 00-1-1z" clipRule="evenodd" />
+                        </svg>
+                      )}
+                      <span className="text-sm font-mono text-gray-700 truncate">{f.filename}</span>
                     </div>
                   ))}
                 </div>
@@ -421,7 +445,7 @@ function App() {
 
             {/* Source only */}
             {sourceOnly.length > 0 && (
-              <Section title={`Source only (${sourceOnly.length})`}>
+              <Section title={`Source only — not found in destination (${sourceOnly.length})`}>
                 <div className="rounded-xl border border-gray-200 overflow-hidden max-h-48 overflow-y-auto divide-y divide-gray-100">
                   {sourceOnly.map((name) => (
                     <p
@@ -437,7 +461,7 @@ function App() {
 
             {/* Dest only */}
             {destOnly.length > 0 && (
-              <Section title={`Destination only (${destOnly.length})`}>
+              <Section title={`Destination only — not found in source (${destOnly.length})`}>
                 <div className="rounded-xl border border-gray-200 overflow-hidden max-h-48 overflow-y-auto divide-y divide-gray-100">
                   {destOnly.map((name) => (
                     <p
