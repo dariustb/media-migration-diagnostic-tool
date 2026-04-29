@@ -146,11 +146,23 @@ def run_scan(job: ScanJob, params: ScanParams) -> None:
             name: {"local_path": local_unique[name], "remote_path": remote_unique[name]}
             for name in matched_names
         }
+        def rel_dir(root: str, full_path: str) -> str:
+            d = os.path.relpath(os.path.dirname(full_path), root)
+            return "" if d == "." else d
+
         job.results.update(
             {
                 "matched": matched,
-                "source_only": sorted(local_names - remote_names),
-                "dest_only": sorted(remote_names - local_names),
+                "source_only": sorted(
+                    ({"name": n, "rel_dir": rel_dir(params.local_root, local_unique[n])}
+                     for n in local_names - remote_names),
+                    key=lambda x: (x["rel_dir"], x["name"]),
+                ),
+                "dest_only": sorted(
+                    ({"name": n, "rel_dir": rel_dir(params.remote_root, remote_unique[n])}
+                     for n in remote_names - local_names),
+                    key=lambda x: (x["rel_dir"], x["name"]),
+                ),
             }
         )
 

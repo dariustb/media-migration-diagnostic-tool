@@ -211,10 +211,10 @@ function App() {
     a.filename.localeCompare(b.filename)
   );
   const sourceOnly = isDone
-    ? ((job!.results.source_only as string[]) ?? [])
+    ? ((job!.results.source_only as { name: string; rel_dir: string }[]) ?? [])
     : [];
   const destOnly = isDone
-    ? ((job!.results.dest_only as string[]) ?? [])
+    ? ((job!.results.dest_only as { name: string; rel_dir: string }[]) ?? [])
     : [];
 
   return (
@@ -447,13 +447,13 @@ function App() {
             {sourceOnly.length > 0 && (
               <Section title={`Source only — not found in destination (${sourceOnly.length})`}>
                 <div className="rounded-xl border border-gray-200 overflow-hidden max-h-48 overflow-y-auto divide-y divide-gray-100">
-                  {sourceOnly.map((name) => (
-                    <p
-                      key={name}
-                      className="px-3 py-1.5 text-sm font-mono text-gray-600"
-                    >
-                      {name}
-                    </p>
+                  {sourceOnly.map((f) => (
+                    <div key={f.name} className="flex items-baseline gap-2 px-3 py-1.5">
+                      <span className="text-sm font-mono text-gray-800">{f.name}</span>
+                      {f.rel_dir && (
+                        <span className="text-xs font-mono text-gray-400 truncate">{f.rel_dir}</span>
+                      )}
+                    </div>
                   ))}
                 </div>
               </Section>
@@ -463,13 +463,13 @@ function App() {
             {destOnly.length > 0 && (
               <Section title={`Destination only — not found in source (${destOnly.length})`}>
                 <div className="rounded-xl border border-gray-200 overflow-hidden max-h-48 overflow-y-auto divide-y divide-gray-100">
-                  {destOnly.map((name) => (
-                    <p
-                      key={name}
-                      className="px-3 py-1.5 text-sm font-mono text-gray-600"
-                    >
-                      {name}
-                    </p>
+                  {destOnly.map((f) => (
+                    <div key={f.name} className="flex items-baseline gap-2 px-3 py-1.5">
+                      <span className="text-sm font-mono text-gray-800">{f.name}</span>
+                      {f.rel_dir && (
+                        <span className="text-xs font-mono text-gray-400 truncate">{f.rel_dir}</span>
+                      )}
+                    </div>
                   ))}
                 </div>
               </Section>
