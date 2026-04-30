@@ -42,6 +42,7 @@ interface BadEntry {
   remote_path: string;
   local_checksum: string;
   remote_checksum: string;
+  rel_dir: string;
 }
 
 const STAGES = 5;
@@ -207,9 +208,13 @@ function App() {
   const checksumBad = isDone
     ? ((job!.results.checksum_bad as BadEntry[]) ?? [])
     : [];
-  const allMatched = [...checksumOk.map((f) => ({ ...f, ok: true })), ...checksumBad.map((f) => ({ ...f, ok: false }))].sort((a, b) =>
-    a.filename.localeCompare(b.filename)
-  );
+  const allMatched = [
+    ...checksumBad.map((f) => ({ ...f, ok: false })),
+    ...checksumOk.map((f) => ({ ...f, ok: true })),
+  ].sort((a, b) => {
+    if (a.ok !== b.ok) return a.ok ? 1 : -1;
+    return a.filename.localeCompare(b.filename);
+  });
   const sourceOnly = isDone
     ? ((job!.results.source_only as { name: string; rel_dir: string }[]) ?? [])
     : [];
@@ -426,17 +431,20 @@ function App() {
                 </div>
                 <div className="rounded-xl border border-gray-200 overflow-hidden divide-y divide-gray-100 max-h-[32rem] overflow-y-auto">
                   {allMatched.map((f) => (
-                    <div key={f.filename} className="flex items-center gap-3 px-3 py-2">
-                      {f.ok ? (
-                        <svg className="w-4 h-4 text-green-500 shrink-0" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L8 12.586 4.707 9.293a1 1 0 00-1.414 1.414l4 4a1 1 0 001.414 0l8-8a1 1 0 000-1.414z" clipRule="evenodd" />
-                        </svg>
-                      ) : (
-                        <svg className="w-4 h-4 text-yellow-500 shrink-0" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-3a1 1 0 00-1 1v.5a1 1 0 002 0V11a1 1 0 00-1-1z" clipRule="evenodd" />
-                        </svg>
-                      )}
-                      <span className="text-sm font-mono text-gray-700 truncate">{f.filename}</span>
+                    <div key={f.filename} className="grid grid-cols-2 gap-4 px-3 py-2">
+                      <div className="flex items-center gap-3 min-w-0">
+                        {f.ok ? (
+                          <svg className="w-4 h-4 text-green-500 shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L8 12.586 4.707 9.293a1 1 0 00-1.414 1.414l4 4a1 1 0 001.414 0l8-8a1 1 0 000-1.414z" clipRule="evenodd" />
+                          </svg>
+                        ) : (
+                          <svg className="w-4 h-4 text-yellow-500 shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-3a1 1 0 00-1 1v.5a1 1 0 002 0V11a1 1 0 00-1-1z" clipRule="evenodd" />
+                          </svg>
+                        )}
+                        <span className="text-sm font-mono text-gray-700 truncate">{f.filename}</span>
+                      </div>
+                      <span className="text-sm font-mono text-gray-400 break-all">{f.rel_dir}</span>
                     </div>
                   ))}
                 </div>

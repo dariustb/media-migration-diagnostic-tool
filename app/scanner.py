@@ -200,6 +200,7 @@ def run_scan(job: ScanJob, params: ScanParams) -> None:
                 "remote_path": paths["remote_path"],
                 "local_checksum": local_h,
                 "remote_checksum": remote_h,
+                "rel_dir": rel_dir(params.local_root, paths["local_path"]),
             }
             (checksum_ok if local_h == remote_h else checksum_bad).append(entry)
 
